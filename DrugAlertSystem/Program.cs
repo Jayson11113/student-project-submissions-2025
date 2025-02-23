@@ -6,9 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DrugsConn") ?? throw new InvalidOperationException("Connection string 'DrugsIdentityDbContextConnection' not found.");
 
 builder.Services.AddDbContext<DrugsIdentityDbContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddDbContext<DrugsDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<DrugsUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<DrugsIdentityDbContext>();
+builder.Services.AddDbContext<DrugsDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<DrugsUser>(options =>
+    options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>() // ? This is required to enable roles
+    .AddEntityFrameworkStores<DrugsIdentityDbContext>()
+    .AddRoleManager<RoleManager<IdentityRole>>(); // ? Use RoleManager<IdentityRole>
+
+
 builder.Services.AddRazorPages();
 // Add services to the container.
 builder.Services.AddControllersWithViews();

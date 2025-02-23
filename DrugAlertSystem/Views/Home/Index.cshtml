@@ -1,8 +1,117 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard - Drug Alert System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <h1 class="text-center text-danger">Drug Alert System Dashboard</h1>
+    <p class="text-center text-muted">Monitor drug-related incidents and law enforcement actions in real time.</p>
+
+    <!-- System Statistics -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body">
+                    <h4>Total Reports</h4>
+                    <h2>@Model.TotalReports</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow">
+                <div class="card-body">
+                    <h4>Active Cases</h4>
+                    <h2>@Model.ActiveCases</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h4>Resolved Cases</h4>
+                    <h2>@Model.ResolvedCases</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <h4>Hotspots</h4>
+                    <h2>@Model.Hotspots</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Section (Only Show If Hotspots Exist) -->
+    @if (Model.Hotspots > 0)
+    {
+        <div class="alert alert-danger text-center">
+            <strong>Warning:</strong> High drug activity detected in multiple areas. Law enforcement intervention required!
+        </div>
+    }
+
+    <!-- Recent Reports Table -->
+    <h3 class="text-dark">Recent Reports</h3>
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Report ID</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Reported At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Model.RecentReports)
+            {
+                <tr>
+                    <td>@report.ReportId</td>
+                    <td>@report.ReportType</td>
+                    <td>@report.Location</td>
+                    <td>
+                        <span class="badge @(report.Status == "Pending" ? "bg-warning" : report.Status == "Resolved" ? "bg-success" : "bg-danger")">
+                            @report.Status
+                        </span>
+                    </td>
+                    <td>@report.ReportedAt</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Map Section -->
+    <h3 class="text-dark">Incident Map</h3>
+    <div id="map" style="width: 100%; height: 400px;"></div>
 </div>
+
+<!-- Leaflet.js (OpenStreetMap) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var map = L.map('map').setView([-17.8292, 31.0522], 12); // Default to Harare
+
+        // Add OpenStreetMap layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Load real incident data from the model
+        var incidents = @Html.Raw(Json.Serialize(Model.MapIncidents));
+
+        incidents.forEach(function (incident) {
+            var marker = L.marker([incident.latitude, incident.longitude], {
+                icon: L.icon({
+                    iconUrl: `http://maps.google.com/mapfiles/ms/icons/${incident.color}-dot.png`,
+                    iconSize: [32, 32]
+                })
+            }).addTo(map)
+            .bindPopup(`<strong>${incident.type}</strong>`);
+        });
+    });
+</script>

@@ -1,0 +1,64 @@
+﻿@model IEnumerable<DrugAlertSystem.Models.User>
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center text-danger">@ViewData["Title"]</h1>
+    <p class="text-center text-muted">Manage registered users and their access levels.</p>
+
+    <div class="text-end mb-3">
+        <a asp-action="Create" class="btn btn-success">+ Create New User</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered table-striped table-hover table-flex-nowrap">
+            <thead class="table-dark">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.UserName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Email)</th>
+                    <th>@Html.DisplayNameFor(model => model.PhoneNumber)</th>
+                    <th>@Html.DisplayNameFor(model => model.EmailConfirmed)</th>
+                    <th>@Html.DisplayNameFor(model => model.TwoFactorEnabled)</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                        <td>
+                            @if (item.EmailConfirmed)
+                            {
+                                <span class="badge bg-success">Confirmed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Unconfirmed</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.TwoFactorEnabled)
+                            {
+                                <span class="badge bg-info">Enabled</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Disabled</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Details</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

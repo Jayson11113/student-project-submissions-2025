@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DrugAlertSystem.styles.css" asp-append-version="true" />
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.2.2/datatables.min.css" rel="stylesheet" integrity="sha384-M6C9anzq7GcT0g1mv0hVorHndQDVZLVBkRVdRb2SsQT7evLamoeztr1ce+tvn+f2" crossorigin="anonymous">
+
 </head>
 <body>
     <header>
@@ -30,16 +32,9 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Create">Report an Incident</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="UserReports">My Reports</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">My Reports</a>
                             </li>
 
-                            <!-- Admin & Law Enforcement -->
-                            @if (User.IsInRole("Admin") || User.IsInRole("LawEnforcement"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">View Reports</a>
-                                </li>
-                            }
 
                             <!-- Admin Only -->
                             @if (User.IsInRole("Admin"))
@@ -47,31 +42,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Users">Manage Users</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Roles">Manage Users</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Settings">System Settings</a>
-                                </li>
+
+                               
                             }
                         }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="/Identity/Account/Login">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="/Identity/Account/Register">Register</a>
-                            </li>
-                        }
-                    </ul>
 
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li>
+                            <partial name="_LoginPartial" />
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <a class="btn btn-danger" asp-area="" asp-controller="Reports" asp-action="Create">Report an Incident</a>
             @RenderBody()
         </main>
     </div>
@@ -84,6 +72,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.2.2/datatables.min.js" integrity="sha384-k90VzuFAoyBG5No1d5yn30abqlaxr9+LfAPp6pjrd7U3T77blpvmsS8GqS70xcnH" crossorigin="anonymous"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

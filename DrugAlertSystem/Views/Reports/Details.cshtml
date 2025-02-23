@@ -1,60 +1,90 @@
 ﻿@model DrugAlertSystem.Models.Report
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Report Details";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <h1 class="text-center text-danger">@ViewData["Title"]</h1>
+    <p class="text-center text-muted">View details of the reported incident.</p>
 
-<div>
-    <h4>Report</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ReportType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ReportType)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Latitude)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Latitude)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Longitude)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Longitude)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-    </dl>
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h4 class="card-title text-center text-dark">Incident Information</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-3">Report Type</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ReportType)</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Status == "Pending")
+                    {
+                        <span class="badge bg-warning text-dark">@Model.Status</span>
+                    }
+                    else if (Model.Status == "Resolved")
+                    {
+                        <span class="badge bg-success">@Model.Status</span>
+                    }
+                    else if (Model.Status == "Under Investigation")
+                    {
+                        <span class="badge bg-danger">@Model.Status</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.Status</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Reported On</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.CreatedAt)</dd>
+
+                <dt class="col-sm-3">Reported By</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.User.Id)</dd>
+            </dl>
+
+            <!-- Map Section -->
+            <h4 class="text-dark text-center">Incident Location</h4>
+            <div id="map" style="width: 100%; height: 400px;"></div>
+
+            <dl class="row mt-3">
+                <dt class="col-sm-3">Latitude</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Latitude)</dd>
+
+                <dt class="col-sm-3">Longitude</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Longitude)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Back and Edit Links -->
+    <div class="text-center mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<!-- OpenStreetMap (Leaflet.js) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var latitude = @Model.Latitude;
+        var longitude = @Model.Longitude;
+
+        var map = L.map('map').setView([latitude, longitude], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup("<b>@Model.ReportType</b><br>@Model.Description")
+            .openPopup();
+    });
+</script>

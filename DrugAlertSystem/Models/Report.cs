@@ -25,11 +25,11 @@ public partial class Report
     [Column("description", TypeName = "text")]
     public string Description { get; set; }
 
-    [Column("latitude", TypeName = "decimal(9, 6)")]
-    public decimal Latitude { get; set; }
+    [Column("latitude")]
+    public double Latitude { get; set; }
 
-    [Column("longitude", TypeName = "decimal(9, 6)")]
-    public decimal Longitude { get; set; }
+    [Column("longitude")]
+    public double Longitude { get; set; }
 
     [Column("status")]
     [StringLength(20)]

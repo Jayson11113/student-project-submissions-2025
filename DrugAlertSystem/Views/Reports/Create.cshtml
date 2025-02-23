@@ -1,52 +1,110 @@
 ﻿@model DrugAlertSystem.Models.Report
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Report an Incident";
 }
 
-<h1>Create</h1>
+<div class="container mt-4">
+    <h1 class="text-center text-danger">@ViewData["Title"]</h1>
+    <p class="text-center text-muted">Help authorities track and stop illegal drug activities by reporting suspicious incidents.</p>
 
-<h4>Report</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h4 class="card-title text-center text-dark">Submit a New Report</h4>
+                    <hr />
+
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <!-- Hidden User ID (for logged-in users) -->
+                        <div class="form-group" hidden>
+                            <label asp-for="UserId" class="control-label"></label>
+                            <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                        </div>
+
+                        <!-- Report Type Dropdown -->
+                        <div class="form-group mb-3">
+                            <label asp-for="ReportType" class="form-label">Report Type</label>
+                            <select asp-for="ReportType" class="form-control">
+                                <option value="">-- Select Report Type --</option>
+                                <option value="Drug Abuse">Drug Abuse</option>
+                                <option value="Drug Selling">Drug Selling</option>
+                                <option value="Drug Smuggling">Drug Smuggling</option>
+                                <option value="Suspicious Activity">Suspicious Activity</option>
+                            </select>
+                            <span asp-validation-for="ReportType" class="text-danger"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label">Description (Optional)</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Provide additional details..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Location Fields (Auto-filled) -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Latitude" class="form-label">Latitude</label>
+                                    <input asp-for="Latitude" class="form-control" id="latitude" readonly />
+                                    <span asp-validation-for="Latitude" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Longitude" class="form-label">Longitude</label>
+                                    <input asp-for="Longitude" class="form-control" id="longitude" readonly />
+                                    <span asp-validation-for="Longitude" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger w-100">Submit Report</button>
+                        </div>
+                    </form>
+
+                    <!-- Back Link -->
+                    <div class="text-center mt-3">
+                        <a asp-action="Index" class="text-muted">← Back to Reports</a>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ReportType" class="control-label"></label>
-                <input asp-for="ReportType" class="form-control" />
-                <span asp-validation-for="ReportType" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Latitude" class="control-label"></label>
-                <input asp-for="Latitude" class="form-control" />
-                <span asp-validation-for="Latitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Longitude" class="control-label"></label>
-                <input asp-for="Longitude" class="form-control" />
-                <span asp-validation-for="Longitude" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        function getLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        document.getElementById("latitude").value = position.coords.latitude;
+                        document.getElementById("longitude").value = position.coords.longitude;
+                    },
+                    function (error) {
+                        alert("Location access denied or unavailable. Try turning on your GPS and try again. ");
+                    },
+                    {
+                        enableHighAccuracy: true, // Request more precise location
+                        timeout: 10000,  // Wait max 10 seconds for response
+                        maximumAge: 0  // Do not use cached location
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Call function when page loads
+        window.onload = getLocation;
+
+    </script>
 }

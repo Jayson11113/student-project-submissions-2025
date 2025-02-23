@@ -1,6 +1,65 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Privacy Policy - Drug Alert System";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container mt-4">
+    <h1 class="text-center text-danger">@ViewData["Title"]</h1>
+    <p class="text-center text-muted">Your privacy is important to us. Learn how we handle your data.</p>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h3 class="text-dark">1. Information We Collect</h3>
+            <p>
+                The Drug Alert System collects certain data to ensure accurate incident reporting and law enforcement response. This includes:
+            </p>
+            <ul>
+                <li>📍 <strong>Location Data</strong> (for accurate incident reporting)</li>
+                <li>👤 <strong>User Information</strong> (email, name, and phone number if provided)</li>
+                <li>📝 <strong>Incident Reports</strong> (type, description, and timestamp)</li>
+            </ul>
+            <p>
+                We do not share this data with third parties except for <strong>law enforcement agencies</strong> when necessary.
+            </p>
+
+            <h3 class="text-dark">2. How We Use Your Data</h3>
+            <p>Your information is used for:</p>
+            <ul>
+                <li>📌 Pinning incidents on the map for public awareness.</li>
+                <li>🚔 Assisting law enforcement in investigations.</li>
+                <li>📊 Generating statistics to track drug-related activities.</li>
+            </ul>
+
+            <h3 class="text-dark">3. How We Protect Your Data</h3>
+            <p>
+                Security is our top priority. We implement the following measures:
+            </p>
+            <ul>
+                <li>🔒 <strong>Encryption:</strong> All data is encrypted before storage.</li>
+                <li>🛡️ <strong>Secure Access:</strong> Only authorized personnel can access sensitive information.</li>
+                <li>🚀 <strong>Regular Security Audits:</strong> We routinely review our security policies.</li>
+            </ul>
+
+            <h3 class="text-dark">4. Your Rights</h3>
+            <p>As a user, you have the right to:</p>
+            <ul>
+                <li>✅ Access your personal data.</li>
+                <li>✅ Request deletion of your reports.</li>
+                <li>✅ Opt out of location tracking (may limit functionality).</li>
+            </ul>
+            <p>To request any changes, please contact <strong>support@drugalertsystem.com</strong>.</p>
+
+            <h3 class="text-dark">5. Contact Us</h3>
+            <p>
+                If you have any questions about our privacy policy, reach out to us at:
+            </p>
+            <ul>
+                <li>📧 <strong>Email:</strong> <a href="mailto:support@drugalertsystem.com">support@drugalertsystem.com</a></li>
+                <li>📍 <strong>Address:</strong> 123 Safety Street, Harare, Zimbabwe</li>
+            </ul>
+
+            <div class="text-center mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>

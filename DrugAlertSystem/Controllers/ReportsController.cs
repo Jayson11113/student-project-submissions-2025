@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using DrugAlertSystem.Data;
 using DrugAlertSystem.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using DrugAlertSystem.Areas.Identity.Data;
 
 namespace DrugAlertSystem.Controllers
 {
@@ -15,18 +17,30 @@ namespace DrugAlertSystem.Controllers
     public class ReportsController : Controller
     {
         private readonly DrugsDbContext _context;
+        private readonly UserManager<DrugsUser> _userManager;
 
-        public ReportsController(DrugsDbContext context)
+        public ReportsController(DrugsDbContext context, UserManager<DrugsUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Reports
         public async Task<IActionResult> Index()
         {
-            var drugsDbContext = _context.Reports.Include(r => r.User);
-            return View(await drugsDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+            var userId = user?.Id;
+
+            // Check if user is in an admin or law enforcement role
+            bool isAdminOrLawEnforcement = User.IsInRole("Admin") || User.IsInRole("LawEnforcement");
+
+            var reports = isAdminOrLawEnforcement
+                ? _context.Reports.Include(r => r.User) // Return all reports for Admin/Law Enforcement
+                : _context.Reports.Where(r => r.UserId == userId).Include(r => r.User); // Return only user's reports
+
+            return View(await reports.ToListAsync());
         }
+
 
         // GET: Reports/Details/5
         public async Task<IActionResult> Details(Guid? id)
@@ -48,9 +62,11 @@ namespace DrugAlertSystem.Controllers
         }
 
         // GET: Reports/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+
+            var user = (await _userManager.GetUserAsync(User));
+            ViewData["UserId"] = new SelectList(_context.Users.Where(f=>f.Id == user.Id), "Id", "Id");
             return View();
         }
 
@@ -59,7 +75,7 @@ namespace DrugAlertSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,ReportType,Description,Latitude,Longitude,Status,CreatedAt")] Report report)
+        public async Task<IActionResult> Create( Report report)
         {
             if (ModelState.IsValid)
             {
@@ -94,7 +110,7 @@ namespace DrugAlertSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,UserId,ReportType,Description,Latitude,Longitude,Status,CreatedAt")] Report report)
+        public async Task<IActionResult> Edit(Guid id,  Report report)
         {
             if (id != report.Id)
             {
