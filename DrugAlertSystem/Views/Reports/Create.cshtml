@@ -39,29 +39,31 @@
 
                         <!-- Description -->
                         <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label">Description (Optional)</label>
-                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Provide additional details..."></textarea>
+                            <label asp-for="Description" class="form-label">Description & location/address</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Provide additional details of the location/address & details..."></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
+                        <div class="alert alert-warning">
 
-                        <!-- Location Fields (Auto-filled) -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label asp-for="Latitude" class="form-label">Latitude</label>
-                                    <input asp-for="Latitude" class="form-control" id="latitude" readonly />
-                                    <span asp-validation-for="Latitude" class="text-danger"></span>
+                            <p>(Auto-filled)  </p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="Latitude" class="form-label">Latitude</label>
+                                        <input asp-for="Latitude" class="form-control" id="latitude" readonly />
+                                        <span asp-validation-for="Latitude" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="Longitude" class="form-label">Longitude</label>
+                                        <input asp-for="Longitude" class="form-control" id="longitude" readonly />
+                                        <span asp-validation-for="Longitude" class="text-danger"></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label asp-for="Longitude" class="form-label">Longitude</label>
-                                    <input asp-for="Longitude" class="form-control" id="longitude" readonly />
-                                    <span asp-validation-for="Longitude" class="text-danger"></span>
-                                </div>
-                            </div>
+
                         </div>
-
                         <!-- Submit Button -->
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-danger w-100">Submit Report</button>

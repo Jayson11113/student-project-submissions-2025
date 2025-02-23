@@ -28,13 +28,15 @@ namespace DrugAlertSystem.Controllers
                 .Select(g => new
                 {
                     Total = g.Count(),
-                    Active = g.Count(r => r.Status == "Pending" || r.Status == "Under Investigation"),
+                    Active = g.Count(r => r.Status == "Pending" ),
+                    UnderInvestigation = g.Count(r => r.Status == "Under Investigation"),
                     Resolved = g.Count(r => r.Status == "Resolved")
                 })
                 .FirstOrDefaultAsync();
 
             var totalReports = reportCounts?.Total ?? 0;
             var activeCases = reportCounts?.Active ?? 0;
+            var underInvestigation = reportCounts?.UnderInvestigation ?? 0;
             var resolvedCases = reportCounts?.Resolved ?? 0;
 
             // Identify hotspots (locations with 3+ reports)
@@ -74,6 +76,7 @@ namespace DrugAlertSystem.Controllers
             {
                 TotalReports = totalReports,
                 ActiveCases = activeCases,
+                UnderInvestigation = underInvestigation,
                 ResolvedCases = resolvedCases,
                 Hotspots = hotspots,
                 RecentReports = recentReports,
