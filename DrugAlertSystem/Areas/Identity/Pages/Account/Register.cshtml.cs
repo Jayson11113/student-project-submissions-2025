@@ -125,7 +125,7 @@ namespace DrugAlertSystem.Areas.Identity.Pages.Account
 
                     var userId = await _userManager.GetUserIdAsync(user);
 
-                    await _userManager.AddToRoleAsync(user, "Admin");
+                   // await _userManager.AddToRoleAsync(user, "Admin");
                
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
