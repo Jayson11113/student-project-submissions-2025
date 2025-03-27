@@ -46,8 +46,9 @@
                                
                             }
                         }
-
+                   
                     </ul>
+                   
                     <ul class="navbar-nav">
                         <li>
                             <partial name="_LoginPartial" />
@@ -59,6 +60,17 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    Back
+                </button>
+                <button type="button" class="btn btn-success" onclick="location.reload()">
+                    Refresh
+                </button>
+                <button type="button" class="btn btn-primary" onclick="history.forward()">
+                    Forward
+                </button>
+            </div>
             <a class="btn btn-danger" asp-area="" asp-controller="Reports" asp-action="Create">Report an Incident</a>
             @RenderBody()
         </main>

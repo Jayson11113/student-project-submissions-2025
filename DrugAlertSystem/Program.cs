@@ -21,6 +21,10 @@ builder.Services.AddRazorPages();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddMvc();
+
+builder.Services.AddProgressiveWebApp();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,7 +37,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
- 
+
 app.UseRouting();
 
 app.UseAuthorization();
