@@ -4,76 +4,65 @@
     ViewData["Title"] = "Report an Incident";
 }
 
-<div class="container mt-4">
-    <h1 class="text-center text-danger">@ViewData["Title"]</h1>
-    <p class="text-center text-muted">Help authorities track and stop illegal drug activities by reporting suspicious incidents.</p>
-
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg">
-                <div class="card-body">
-                    <h4 class="card-title text-center text-dark">Submit a New Report</h4>
-                    <hr />
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+                    <p class="text-center text-secondary mb-4">Help authorities track and stop illegal drug activities by reporting suspicious incidents.</p>
 
-                    <form asp-action="Create">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <form asp-action="Create" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                        <!-- Hidden User ID (for logged-in users) -->
+                        <!-- Hidden User ID -->
                         <div class="form-group" hidden>
                             <label asp-for="UserId" class="control-label"></label>
                             <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
                         </div>
 
-                        <!-- Report Type Dropdown -->
-                        <div class="form-group mb-3">
-                            <label asp-for="ReportType" class="form-label">Report Type</label>
-                            <select asp-for="ReportType" class="form-control">
-                                <option value="">-- Select Report Type --</option>
+                        <!-- Report Type -->
+                        <div class="mb-4">
+                            <label asp-for="ReportType" class="form-label fw-semibold">Report Type</label>
+                            <select asp-for="ReportType" class="form-select" required>
+                                <option value="">Select an incident type</option>
                                 <option value="Drug Abuse">Drug Abuse</option>
                                 <option value="Drug Selling">Drug Selling</option>
                                 <option value="Drug Smuggling">Drug Smuggling</option>
                                 <option value="Suspicious Activity">Suspicious Activity</option>
                             </select>
-                            <span asp-validation-for="ReportType" class="text-danger"></span>
+                            <span asp-validation-for="ReportType" class="text-danger small"></span>
                         </div>
 
                         <!-- Description -->
-                        <div class="form-group mb-3">
-                            <label asp-for="Description" class="form-label">Description & location/address</label>
-                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Provide additional details of the location/address & details..."></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-semibold">Description & Location</label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Provide detailed information about the incident and location..." required></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
-                        <div class="alert alert-warning">
 
-                            <p>(Auto-filled)  </p>
-                            <div class="row">
+                        <!-- Location Data -->
+                        <div class="bg-light p-3 rounded mb-4 border">
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="Latitude" class="form-label">Latitude</label>
-                                        <input asp-for="Latitude" class="form-control" id="latitude" readonly />
-                                        <span asp-validation-for="Latitude" class="text-danger"></span>
-                                    </div>
+                                    <label asp-for="Latitude" class="form-label fw-semibold">Latitude</label>
+                                    <input asp-for="Latitude" class="form-control" id="latitude" readonly />
+                                    <span asp-validation-for="Latitude" class="text-danger small"></span>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="Longitude" class="form-label">Longitude</label>
-                                        <input asp-for="Longitude" class="form-control" id="longitude" readonly />
-                                        <span asp-validation-for="Longitude" class="text-danger"></span>
-                                    </div>
+                                    <label asp-for="Longitude" class="form-label fw-semibold">Longitude</label>
+                                    <input asp-for="Longitude" class="form-control" id="longitude" readonly />
+                                    <span asp-validation-for="Longitude" class="text-danger small"></span>
                                 </div>
                             </div>
-
                         </div>
+
                         <!-- Submit Button -->
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-danger w-100">Submit Report</button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit Report</button>
+                            <a asp-action="Index" class="btn btn-link text-decoration-none">Back to Reports</a>
                         </div>
                     </form>
-
-                    <!-- Back Link -->
-                    <div class="text-center mt-3">
-                        <a asp-action="Index" class="text-muted">← Back to Reports</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -92,12 +81,12 @@
                         document.getElementById("longitude").value = position.coords.longitude;
                     },
                     function (error) {
-                        alert("Location access denied or unavailable. Try turning on your GPS and try again. ");
+                        alert("Location access denied or unavailable. Please enable GPS and try again.");
                     },
                     {
-                        enableHighAccuracy: true, // Request more precise location
-                        timeout: 10000,  // Wait max 10 seconds for response
-                        maximumAge: 0  // Do not use cached location
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
                     }
                 );
             } else {
@@ -105,8 +94,6 @@
             }
         }
 
-        // Call function when page loads
-        window.onload = getLocation;
-
+        document.addEventListener('DOMContentLoaded', getLocation);
     </script>
 }
