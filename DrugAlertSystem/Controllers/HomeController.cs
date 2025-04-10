@@ -86,7 +86,7 @@ namespace DrugAlertSystem.Controllers
             return View(dashboardModel);
         }
 
-
+[AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();

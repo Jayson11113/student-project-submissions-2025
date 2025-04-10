@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DrugAlertSystem.Data;
 using DrugAlertSystem.Areas.Identity.Data;
+using DrugAlertSystem.Services;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DrugsConn") ?? throw new InvalidOperationException("Connection string 'DrugsIdentityDbContextConnection' not found.");
 
@@ -16,6 +17,7 @@ builder.Services.AddDefaultIdentity<DrugsUser>(options =>
     .AddEntityFrameworkStores<DrugsIdentityDbContext>()
     .AddRoleManager<RoleManager<IdentityRole>>(); // ? Use RoleManager<IdentityRole>
 
+builder.Services.AddScoped<DrugHotspotPredictionService>();
 
 builder.Services.AddRazorPages();
 // Add services to the container.

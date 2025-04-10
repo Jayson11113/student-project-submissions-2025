@@ -1,0 +1,63 @@
+@model DrugAlertSystem.Models.DrugHotspotPredictionResultViewModel
+
+@{
+    ViewData["Title"] = "Prediction Result";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Input Details</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@Model.Input.Location</dd>
+
+                        <dt class="col-sm-4">People Loitering</dt>
+                        <dd class="col-sm-8">@(Model.Input.PeopleLoitering ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">Drug Wrappers Found</dt>
+                        <dd class="col-sm-8">@(Model.Input.DrugWrappersFound ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">Strong Smell</dt>
+                        <dd class="col-sm-8">@(Model.Input.StrongSmell ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">Loud Noise or Music</dt>
+                        <dd class="col-sm-8">@(Model.Input.LoudNoiseOrMusic ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">Shoe Hanging on Wire</dt>
+                        <dd class="col-sm-8">@(Model.Input.ShoeHangingOnWire ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">People In and Out</dt>
+                        <dd class="col-sm-8">@(Model.Input.PeopleInAndOut ? "Yes" : "No")</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Prediction Result</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert @(Model.IsHotspot ? "alert-danger" : "alert-success")">
+                        <h5 class="alert-heading">
+                            @(Model.IsHotspot ? "High Risk: Potential Drug Hotspot" : "Low Risk: Not a Drug Hotspot")
+                        </h5>
+                        <p>Probability: @Model.Probability.ToString("P2")</p>
+                        <p>Risk Score: @Model.Score.ToString("F2")</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a asp-action="Predict" class="btn btn-primary">Make Another Prediction</a>
+            </div>
+        </div>
+    </div>
+</div> 

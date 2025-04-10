@@ -62,10 +62,22 @@ namespace DrugAlertSystem.Controllers
         }
 
         // GET: Reports/Create
+         [AllowAnonymous]
         public async Task<IActionResult> Create()
         {
 
             var user = (await _userManager.GetUserAsync(User));
+            if(user == null)
+            {
+                user = new DrugsUser()
+                {
+                    UserName = Guid.NewGuid().ToString(),
+                    Email = Guid.NewGuid().ToString(),
+                    PhoneNumber = Guid.NewGuid().ToString()
+                };
+                await _userManager.CreateAsync(user);
+            }
+
             ViewData["UserId"] = new SelectList(_context.Users.Where(f=>f.Id == user.Id), "Id", "Id");
             return View();
         }
@@ -74,12 +86,16 @@ namespace DrugAlertSystem.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create( Report report)
         {
+             
+
             if (ModelState.IsValid)
             {
                 report.Id = Guid.NewGuid();
+                
                 _context.Add(report);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
