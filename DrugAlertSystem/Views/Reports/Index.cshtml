@@ -21,12 +21,13 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
                             <th>@Html.DisplayNameFor(model => model.ReportType)</th>
                             <th>@Html.DisplayNameFor(model => model.Description)</th>
                             <th>@Html.DisplayNameFor(model => model.Latitude)</th>
                             <th>@Html.DisplayNameFor(model => model.Longitude)</th>
                             <th>@Html.DisplayNameFor(model => model.Status)</th>
-                            <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
+
                             <th>@Html.DisplayNameFor(model => model.User)</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -35,18 +36,19 @@
                         @foreach (var item in Model)
                         {
                             <tr>
+                                <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
                                 <td>@Html.DisplayFor(modelItem => item.ReportType)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Description)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Latitude)</td>
                                 <td>@Html.DisplayFor(modelItem => item.Longitude)</td>
                                 <td>
-                                    <span class="badge @(item.Status == "Pending" ? "bg-warning text-dark" : 
-                                        item.Status == "Resolved" ? "bg-success" : 
+                                    <span class="badge @(item.Status == "Pending" ? "bg-warning text-dark" :
+                                        item.Status == "Resolved" ? "bg-success" :
                                         item.Status == "Under Investigation" ? "bg-danger" : "bg-secondary")">
                                         @item.Status
                                     </span>
                                 </td>
-                                <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+
                                 <td>@Html.DisplayFor(modelItem => item.User.Email)</td>
                                 <td class="text-end">
                                     <div class="btn-group">

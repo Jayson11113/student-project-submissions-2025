@@ -25,6 +25,8 @@ namespace DrugAlertSystem.Models
 
         [Display(Name = "People In and Out")]
         public bool PeopleInAndOut { get; set; }
+
+        public Guid ReportId { get; set; } 
     }
 
     public class DrugHotspotPredictionResultViewModel

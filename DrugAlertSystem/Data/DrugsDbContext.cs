@@ -18,6 +18,8 @@ public partial class DrugsDbContext : DbContext
 
     public virtual DbSet<Alert> Alerts { get; set; }
 
+    public virtual DbSet<DrugHotspotDatum> DrugHotspotData { get; set; }
+
     public virtual DbSet<LawEnforcementAction> LawEnforcementActions { get; set; }
 
     public virtual DbSet<Report> Reports { get; set; }
@@ -52,6 +54,13 @@ public partial class DrugsDbContext : DbContext
             entity.Property(e => e.IsFalseReport).HasDefaultValue(false);
 
             entity.HasOne(d => d.Report).WithMany(p => p.Alerts).HasConstraintName("FK__Alerts__report_i__6754599E");
+        });
+
+        modelBuilder.Entity<DrugHotspotDatum>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__DrugHots__3214EC079EC2CC88");
+
+            entity.HasOne(d => d.Report).WithMany(p => p.DrugHotspotData).HasConstraintName("FK__DrugHotsp__Repor__1EA48E88");
         });
 
         modelBuilder.Entity<LawEnforcementAction>(entity =>

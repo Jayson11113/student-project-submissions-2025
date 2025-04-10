@@ -10,6 +10,7 @@ using DrugAlertSystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using DrugAlertSystem.Areas.Identity.Data;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace DrugAlertSystem.Controllers
 {
@@ -51,6 +52,7 @@ namespace DrugAlertSystem.Controllers
             }
 
             var report = await _context.Reports
+                .Include(d=>d.DrugHotspotData)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (report == null)
@@ -62,35 +64,28 @@ namespace DrugAlertSystem.Controllers
         }
 
         // GET: Reports/Create
-         [AllowAnonymous]
+       
         public async Task<IActionResult> Create()
         {
 
             var user = (await _userManager.GetUserAsync(User));
-            if(user == null)
-            {
-                user = new DrugsUser()
-                {
-                    UserName = Guid.NewGuid().ToString(),
-                    Email = Guid.NewGuid().ToString(),
-                    PhoneNumber = Guid.NewGuid().ToString()
-                };
-                await _userManager.CreateAsync(user);
-            }
+           
 
-            ViewData["UserId"] = new SelectList(_context.Users.Where(f=>f.Id == user.Id), "Id", "Id");
-            return View();
+            ViewData["UserId"] = user.Id;
+            return View(new Report(){UserId = user.Id});
         }
 
         // POST: Reports/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [AllowAnonymous]
+       
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Report report)
+        public async Task<IActionResult> Create([ValidateNever] Report report)
         {
+            var user = (await _userManager.GetUserAsync(User));
              
+             report.UserId = user.Id;
 
             if (ModelState.IsValid)
             {
@@ -98,7 +93,7 @@ namespace DrugAlertSystem.Controllers
                 
                 _context.Add(report);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Predict", "DrugHotspot", new {id  = report.Id});
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", report.UserId);
             return View(report);

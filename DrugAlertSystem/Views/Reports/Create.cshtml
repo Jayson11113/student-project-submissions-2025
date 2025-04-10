@@ -2,8 +2,10 @@
 
 @{
     ViewData["Title"] = "Report an Incident";
-}
+    var userId = ViewData["UserId"] as string;
 
+}
+ @userId
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
@@ -13,12 +15,13 @@
                     <p class="text-center text-secondary mb-4">Help authorities track and stop illegal drug activities by reporting suspicious incidents.</p>
 
                     <form asp-action="Create" class="needs-validation" novalidate>
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
 
                         <!-- Hidden User ID -->
                         <div class="form-group" hidden>
                             <label asp-for="UserId" class="control-label"></label>
-                            <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                            <input asp-for="UserId" class="form-control" value="@userId" />
+                            <input asp-for="Status" class="form-control" value="Pending" />
                         </div>
 
                         <!-- Report Type -->

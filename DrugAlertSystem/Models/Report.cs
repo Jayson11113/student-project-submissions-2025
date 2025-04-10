@@ -43,6 +43,9 @@ public partial class Report
     public virtual ICollection<Alert> Alerts { get; set; } = new List<Alert>();
 
     [InverseProperty("Report")]
+    public virtual ICollection<DrugHotspotDatum> DrugHotspotData { get; set; } = new List<DrugHotspotDatum>();
+
+    [InverseProperty("Report")]
     public virtual ICollection<LawEnforcementAction> LawEnforcementActions { get; set; } = new List<LawEnforcementAction>();
 
     [InverseProperty("Report")]
