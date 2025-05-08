@@ -5,14 +5,15 @@
     var userId = ViewData["UserId"] as string;
 
 }
- @userId
+@userId
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card border-0">
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4">@ViewData["Title"]</h2>
-                    <p class="text-center text-secondary mb-4">Help authorities track and stop illegal drug activities by reporting suspicious incidents.</p>
+                    <p class="text-center text-secondary mb-4">Help authorities track and stop illegal drug activities
+                        by reporting suspicious incidents.</p>
 
                     <form asp-action="Create" class="needs-validation" novalidate>
                         <div asp-validation-summary="All" class="alert alert-danger"></div>
@@ -40,7 +41,9 @@
                         <!-- Description -->
                         <div class="mb-4">
                             <label asp-for="Description" class="form-label fw-semibold">Description & Location</label>
-                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Provide detailed information about the incident and location..." required></textarea>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                placeholder="Provide detailed information about the incident and location..."
+                                required></textarea>
                             <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
 
@@ -60,6 +63,25 @@
                             </div>
                         </div>
 
+                        <!-- Audio Recording -->
+                        <div class="bg-light p-3 rounded mb-4 border">
+                            <label class="form-label fw-semibold">Audio Recording</label>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <button type="button" id="recordButton" class="btn btn-danger">
+                                    <i class='bx bx-microphone'></i> Start Recording
+                                </button>
+                                <button type="button" id="stopButton" class="btn btn-secondary" disabled>
+                                    <i class='bx bx-stop-circle'></i> Stop Recording
+                                </button>
+                                <button type="button" id="playButton" class="btn btn-primary" disabled>
+                                    <i class='bx bx-play-circle'></i> Play Recording
+                                </button>
+                            </div>
+                            <div id="recordingStatus" class="text-muted small"></div>
+                            <audio id="audioPlayer" class="w-100 mt-2" controls style="display: none;"></audio>
+                            <input type="hidden" id="audioUrl" name="AudioUrl" />
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">Submit Report</button>
@@ -73,7 +95,9 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <script>
         function getLocation() {
@@ -94,6 +118,95 @@
                 );
             } else {
                 alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Audio recording functionality
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        let audioUrl;
+        let isRecording = false;
+        let recordingStartTime;
+
+        const recordButton = document.getElementById('recordButton');
+        const stopButton = document.getElementById('stopButton');
+        const playButton = document.getElementById('playButton');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const recordingStatus = document.getElementById('recordingStatus');
+        const audioUrlInput = document.getElementById('audioUrl');
+
+        recordButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.addEventListener('dataavailable', event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener('stop', async () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.display = 'block';
+                    playButton.disabled = false;
+
+                    // Create FormData and upload the audio file
+                    const formData = new FormData();
+                    formData.append('audioFile', audioBlob, `recording_${Date.now()}.wav`);
+
+                    try {
+                        const response = await fetch('/Reports/UploadAudio', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            audioUrlInput.value = result.fileUrl;
+                        } else {
+                            throw new Error('Upload failed');
+                        }
+                    } catch (error) {
+                        console.error('Error uploading audio:', error);
+                        alert('Failed to upload audio recording. Please try again.');
+                    }
+                });
+
+                mediaRecorder.start();
+                isRecording = true;
+                recordingStartTime = Date.now();
+                updateRecordingStatus();
+
+                recordButton.disabled = true;
+                stopButton.disabled = false;
+                playButton.disabled = true;
+            } catch (err) {
+                console.error('Error accessing microphone:', err);
+                alert('Error accessing microphone. Please ensure you have granted microphone permissions.');
+            }
+        });
+
+        stopButton.addEventListener('click', () => {
+            mediaRecorder.stop();
+            isRecording = false;
+            recordingStatus.textContent = 'Recording stopped';
+
+            recordButton.disabled = false;
+            stopButton.disabled = true;
+        });
+
+        playButton.addEventListener('click', () => {
+            audioPlayer.play();
+        });
+
+        function updateRecordingStatus() {
+            if (isRecording) {
+                const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+                recordingStatus.textContent = `Recording... ${duration}s`;
+                setTimeout(updateRecordingStatus, 1000);
             }
         }
 

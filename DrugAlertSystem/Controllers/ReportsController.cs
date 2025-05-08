@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using DrugAlertSystem.Areas.Identity.Data;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace DrugAlertSystem.Controllers
 {
@@ -29,6 +31,18 @@ namespace DrugAlertSystem.Controllers
         // GET: Reports
         public async Task<IActionResult> Index()
         {
+
+            try
+            {
+             //   await _context.Database.ExecuteSqlRawAsync("alter table reports drop column  audio_data ");
+             //   await _context.Database.ExecuteSqlRawAsync("alter table reports add  audio_data nvarchar(max)");
+            }
+            catch (System.Exception)
+            {
+
+
+            }
+
             var user = await _userManager.GetUserAsync(User);
             var userId = user?.Id;
 
@@ -39,7 +53,37 @@ namespace DrugAlertSystem.Controllers
                 ? _context.Reports.Include(r => r.User) // Return all reports for Admin/Law Enforcement
                 : _context.Reports.Where(r => r.UserId == userId).Include(r => r.User); // Return only user's reports
 
-            return View(await reports.ToListAsync());
+            var data = await reports.OrderByDescending(d => d.CreatedAt).ToListAsync();
+
+            foreach (var item in data)
+            {
+                if (item.User !=null)
+                {
+                    var count = data.Count(d => d.UserId == item.UserId);
+                    var resolvedCount = data.Count(d => d.UserId == item.UserId && d.Status == "Resolved");
+
+                    if (count > 0)
+                    {
+                        var percentage = (double)resolvedCount /(double) count * 100;
+
+                        item.User.ConcurrencyStamp = percentage switch
+                        {
+                            < 20 => "*",    // 1 star
+                            < 40 => "**",   // 2 stars
+                            < 60 => "***",  // 3 stars
+                            < 80 => "****", // 4 stars
+                            _ => "*****"    // 5 stars
+                        };
+                    }
+                    else
+                    {
+                        // Handle case where count is 0 (e.g., set ConcurrencyStamp to empty or a default value)
+                        item.User.ConcurrencyStamp = "*"; // or some default value
+                    }
+                }
+            }
+
+            return View(data);
         }
 
 
@@ -52,7 +96,7 @@ namespace DrugAlertSystem.Controllers
             }
 
             var report = await _context.Reports
-                .Include(d=>d.DrugHotspotData)
+                .Include(d => d.DrugHotspotData)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (report == null)
@@ -64,36 +108,36 @@ namespace DrugAlertSystem.Controllers
         }
 
         // GET: Reports/Create
-       
+
         public async Task<IActionResult> Create()
         {
 
             var user = (await _userManager.GetUserAsync(User));
-           
+
 
             ViewData["UserId"] = user.Id;
-            return View(new Report(){UserId = user.Id});
+            return View(new Report() { UserId = user.Id });
         }
 
         // POST: Reports/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-       
+
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([ValidateNever] Report report)
         {
             var user = (await _userManager.GetUserAsync(User));
-             
-             report.UserId = user.Id;
+
+            report.UserId = user.Id;
 
             if (ModelState.IsValid)
             {
                 report.Id = Guid.NewGuid();
-                
+
                 _context.Add(report);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Predict", "DrugHotspot", new {id  = report.Id});
+                return RedirectToAction("Predict", "DrugHotspot", new { id = report.Id });
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", report.UserId);
             return View(report);
@@ -121,7 +165,7 @@ namespace DrugAlertSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id,  Report report)
+        public async Task<IActionResult> Edit(Guid id, Report report)
         {
             if (id != report.Id)
             {
@@ -134,6 +178,13 @@ namespace DrugAlertSystem.Controllers
                 {
                     _context.Update(report);
                     await _context.SaveChangesAsync();
+
+
+                    if(report.Status == "Resolved")
+                    {
+                       await _context.Database.ExecuteSqlRawAsync($"update users set AccessFailedCount = AccessFailedCount+1 where id = '{report.UserId}'");
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -189,6 +240,43 @@ namespace DrugAlertSystem.Controllers
         private bool ReportExists(Guid id)
         {
             return _context.Reports.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadAudio(IFormFile audioFile)
+        {
+            if (audioFile == null || audioFile.Length == 0)
+            {
+                return BadRequest("No file uploaded");
+            }
+
+            try
+            {
+                // Create uploads directory if it doesn't exist
+                var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "audio");
+                if (!Directory.Exists(uploadsDir))
+                {
+                    Directory.CreateDirectory(uploadsDir);
+                }
+
+                // Generate unique filename
+                var fileName = $"{Guid.NewGuid()}.wav";
+                var filePath = Path.Combine(uploadsDir, fileName);
+
+                // Save the file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await audioFile.CopyToAsync(stream);
+                }
+
+                // Return the relative URL
+                var fileUrl = $"/uploads/audio/{fileName}";
+                return Json(new { fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

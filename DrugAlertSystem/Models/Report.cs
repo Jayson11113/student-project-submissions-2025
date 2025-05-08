@@ -31,6 +31,10 @@ public partial class Report
     [Column("longitude")]
     public double Longitude { get; set; }
 
+    [Column("audio_data", TypeName = "varchar(255)")]
+    [StringLength(255)]
+    public string AudioData { get; set; }
+
     [Column("status")]
     [StringLength(20)]
     [Unicode(false)]
